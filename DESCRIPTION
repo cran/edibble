@@ -1,6 +1,6 @@
 Package: edibble
 Title: Designing Comparative Experiments
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person(given = "Emi",
            family = "Tanaka",
@@ -21,11 +21,11 @@ URL: https://edibble.emitanaka.org/,
 BugReports: https://github.com/emitanaka/edibble/issues
 Imports: magrittr, rlang, vctrs, tibble, cli, pillar, tidyselect (>=
         1.0.0), nestr, stats, AlgDesign, dae, R6
-Suggests: testthat (>= 3.0.0), rmarkdown, openxlsx, visNetwork, covr
+Suggests: testthat (>= 3.0.0), rmarkdown, openxlsx, visNetwork
 Depends: R (>= 2.10)
 NeedsCompilation: no
-Packaged: 2022-08-25 23:56:36 UTC; etan0038
+Packaged: 2022-10-04 09:52:25 UTC; emi
 Author: Emi Tanaka [aut, cre, cph] (<https://orcid.org/0000-0002-1455-259X>)
 Maintainer: Emi Tanaka <dr.emi.tanaka@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-08-26 06:22:35 UTC
+Date/Publication: 2022-10-04 10:20:08 UTC
