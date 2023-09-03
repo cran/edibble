@@ -12,10 +12,11 @@ as_edibble(.data, ...)
 
 edibble(
   .data,
-  name = NULL,
+  title = NULL,
+  name = "edibble",
   .record = TRUE,
   seed = NULL,
-  kitchen = Kitchen,
+  provenance = Provenance$new(),
   ...
 )
 }
@@ -28,7 +29,9 @@ edibble(
 
 \item{class}{Subclasses for edibble table. The default is NULL.}
 
-\item{name}{Optional name used as title for printing the design.}
+\item{title}{Optional title of the experiment.}
+
+\item{name}{Optional name of the experiment.}
 
 \item{.record}{A logical value. This indicates whether to record this
 code step. The default is TRUE. It should remain TRUE unless this
@@ -36,8 +39,8 @@ function is used as a wrapper in other code.}
 
 \item{seed}{A seed number for reproducibility.}
 
-\item{kitchen}{An environment setup in a manner to manipulate, extract and query
-information on the design.}
+\item{provenance}{An environment setup in a manner to store methods and
+information to trace the origin of the design}
 }
 \value{
 An edibble table.

@@ -5,19 +5,27 @@
 \alias{redesign}
 \title{Start the edibble design}
 \usage{
-design(name = NULL, .record = TRUE, seed = NULL, kitchen = Kitchen)
+design(
+  title = NULL,
+  name = "edibble",
+  .record = TRUE,
+  seed = NULL,
+  provenance = Provenance$new()
+)
 
 redesign(
   .data,
   name = NULL,
   .record = TRUE,
   seed = NULL,
-  kitchen = Kitchen,
+  provenance = provenance,
   ...
 )
 }
 \arguments{
-\item{name}{Optional name used as title for printing the design.}
+\item{title}{Optional title of the experiment.}
+
+\item{name}{Optional name of the experiment.}
 
 \item{.record}{A logical value. This indicates whether to record this
 code step. The default is TRUE. It should remain TRUE unless this
@@ -25,8 +33,8 @@ function is used as a wrapper in other code.}
 
 \item{seed}{A seed number for reproducibility.}
 
-\item{kitchen}{An environment setup in a manner to manipulate, extract and query
-information on the design.}
+\item{provenance}{An environment setup in a manner to store methods and
+information to trace the origin of the design}
 
 \item{.data}{An edibble table.}
 
@@ -46,7 +54,8 @@ Add variables to this design with \code{\link[=set_units]{set_units()}}, \code{\
 \code{\link[=set_rcrds]{set_rcrds()}}.
 
 Other user-facing functions: 
-\code{\link{allot}},
+\code{\link{allot_trts}()},
+\code{\link{allot_units}()},
 \code{\link{expect_rcrds}()},
 \code{\link{export_design}()},
 \code{\link{serve_table}()},
