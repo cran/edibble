@@ -7,7 +7,7 @@
 #' zero rows.
 #'
 #' @inheritParams set_units
-#' @param use_labels To show the labels instead of names.
+#' @param label_nested The columns to show nested labels (if available). Tidyselect compatible.
 #' @param fail What to do when failing to convert graph to table.
 #' @return An `edbl` data frame with columns defined by vertices and
 #' rows displayed only if the vertices are connected and reconcile for output.
@@ -19,12 +19,12 @@
 #'   allot_trts(trt ~ unit) %>%
 #'   assign_trts("random", seed = 521) %>%
 #'   serve_table()
+#' @import tidyselect
 #' @export
-serve_table <- function(.edibble, use_labels = FALSE, fail = c("error", "warn", "ignore"),  .record = TRUE) {
+serve_table <- function(.edibble, label_nested = NULL, fail = c("error", "warn", "ignore"),  .record = TRUE) {
   prov <- activate_provenance(.edibble)
   fail <- match.arg(fail)
   if(.record) prov$record_step()
-
   if(!prov$is_connected) {
     if(fail == "error") abort("The graph cannot be converted to a table format.")
     if(fail == "warn") warn("The graph cannot be converted to a table format.")
@@ -46,14 +46,27 @@ serve_table <- function(.edibble, use_labels = FALSE, fail = c("error", "warn", 
     }
   }
 
-  namesv <- prov$fct_names()
-  if(use_labels) {
-    translate <- stats::setNames(prov$lvl_nodes$label, prov$lvl_nodes$name)
-    # FIXME: it loses the classes when this is done
-    lout <- lapply(lout, function(.x) translate[.x])
+  labeln <- names(eval_select(enexpr(label_nested), lout))
+  lnodes <- lvl_nodes(.edibble)
+  for(aname in names(lunit)) {
+    ln <- lnodes[[aname]]
+    if("label" %in% colnames(ln)) {
+      res <- ln$label[match(lout[[aname]], ln$value)]
+      if(aname %in% labeln) {
+        class(res) <- class(lout[[aname]])
+        attributes(res) <- attributes(lout[[aname]])
+        # don't add attribute that starts with n as
+        # ggplot2 keeps on complaining about partial matching
+        attr(res, "label-non-nested") <- lout[[aname]]
+        lout[[aname]] <- res
+      } else {
+        attr(lout[[aname]], "label-nested") <- res
+      }
+    }
   }
 
-  new_edibble(lout[namesv], design = .edibble)
+  namesv <- prov$fct_names()
+  new_edibble(lout[namesv], .design = .edibble)
 }
 
 

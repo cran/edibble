@@ -7,7 +7,7 @@
 #'
 #' @param ... One-sided or two-sided formula. If the input is a one-sided formula
 #' then the whole treatment is applied to the specified unit.
-#' @inheritParams assign
+#' @inheritParams assign_fcts
 #' @inheritParams set_units
 #' @family user-facing functions
 #' @examples
@@ -20,21 +20,22 @@
 #'               pest ~ block)
 #'
 #' @return Return an edibble design.
-#' @seealso assign
+#' @seealso assign_fcts
 #' @export
 allot_trts <- function(.edibble, ..., .record = TRUE) {
+  dots <- list2(...)
+  if(is.null(.edibble)) return(structure(dots, class = c("edbl_fn", "allot_trts")))
   not_edibble(.edibble)
   des <- edbl_design(.edibble)
   prov <- activate_provenance(des)
   if(.record) prov$record_step()
 
-  dots <- list2(...)
+
   if(!is_null(des$allotment)) {
     des$allotment$trts <- c(des$allotment$trts, dots)
   } else {
     des$allotment <- list(trts = dots, units = NULL)
   }
-
 
   for(ialloc in seq_along(dots)) {
     trts <- all.vars(f_lhs(dots[[ialloc]]))
@@ -49,7 +50,7 @@ allot_trts <- function(.edibble, ..., .record = TRUE) {
       prov$trt_exists()
       tids <- prov$trt_ids
     }
-    prov$append_fct_edges(from = tids, to = uid, group = ialloc, type = "allot")
+    prov$append_fct_edges(from = tids, to = uid, group = TRUE, type = "allot")
   }
 
   return_edibble_with_graph(.edibble, prov)
@@ -65,7 +66,7 @@ allot_trts <- function(.edibble, ..., .record = TRUE) {
 #' This function does not actually assign edges between level nodes.
 #'
 #' @param ... A two-sided formula.
-#' @inheritParams assign
+#' @inheritParams assign_fcts
 #' @inheritParams set_units
 #' @family user-facing functions
 #' @examples
@@ -75,15 +76,15 @@ allot_trts <- function(.edibble, ..., .record = TRUE) {
 #'   allot_units(block ~ plot)
 #'
 #' @return Return an edibble design.
-#' @seealso assign
+#' @seealso assign_fcts
 #' @export
 allot_units <- function(.edibble, ..., .record = TRUE) {
+  dots <- list2(...)
   not_edibble(.edibble)
   prov <- activate_provenance(.edibble)
   if(.record) prov$record_step()
   des <- edbl_design(.edibble)
 
-  dots <- list2(...)
   if(!is_null(des$allotment)) {
     des$allotment$units <- c(des$allotment$units, dots)
   } else {
@@ -103,7 +104,8 @@ allot_units <- function(.edibble, ..., .record = TRUE) {
     if(!op %in% c("crossed_by", "nested_in")) {
       prov$append_fct_edges(from = big_id,
                             to = small_id[length(small_id)],
-                            type = "nest")
+                            type = "nest",
+                            group = TRUE)
       if(length(small) > 1) {
         prov$append_fct_edges(from = big_id,
                               to = small_id[length(small_id) - 1],
@@ -147,15 +149,14 @@ allot_units <- function(.edibble, ..., .record = TRUE) {
 #'
 #' @inheritParams allot_trts
 #' @inheritParams serve_table
-#' @inheritParams assign
+#' @inheritParams assign_fcts
 #'
 #' @export
-allot_table <- function(.edibble, ..., order = "random", seed = NULL, constrain = nesting_structure(.edibble), .record = TRUE) {
+allot_table <- function(.edibble, ..., order = "random", seed = NULL, constrain = nesting_structure(.edibble), label_nested = NULL, fail = "error", .record = TRUE) {
   prov <- activate_provenance(.edibble)
   if(.record) prov$record_step()
-
   .edibble %>%
     allot_trts(..., .record = FALSE) %>%
     assign_trts(order = order, seed = seed, constrain = constrain, .record = FALSE) %>%
-    serve_table(.record = FALSE)
+    serve_table(.record = FALSE, label_nested = {{ label_nested }}, fail = fail)
 }

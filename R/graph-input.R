@@ -12,8 +12,7 @@ graph_input <- function(input, prov, ...) {
 graph_input_type = function(input) {
   if(is_edibble_levels(input)) return("edbl_lvls")
   if(is_nest_levels(input)) return("nest_lvls")
-  if(vec_is(input, numeric(), 1)) return("numeric")
-  if(vec_is(input, integer(), 1)) return("numeric")
+  if(is.numeric(input) & length(input) == 1) return("numeric")
   if(is_vector(input) && !is_named(input)) return("unnamed_vector")
   if(is_vector(input) && is_named(input)) return("named_vector")
   return("unimplemented")
@@ -22,10 +21,10 @@ graph_input_type = function(input) {
 graph_input.default <- function(input, prov, name, class, ...) {
   type <- graph_input_type(input)
   levels <- switch(type,
-                   "numeric" = fct_attrs(lvls(label_seq_length(input, prefix = name))),
-                   "unnamed_vector" = fct_attrs(lvls(input)),
-                   "named_vector" = fct_attrs(lvls(names(input),
-                                              rep = unname(input))),
+                   "numeric" = fct_attrs(lvls(label_seq_length(input, prefix = name)), !!!attr(input, "attrs")),
+                   "unnamed_vector" = fct_attrs(lvls(input), !!!attr(input, "attrs")),
+                   "named_vector" = fct_attrs(lvls(names(input), n = unname(input)),
+                                              !!!attr(input, "attrs")),
                    "unimplemented" = abort(paste0("Not sure how to handle ", class(input)[1])))
   graph_input.edbl_lvls(levels, prov, name, class)
 }
@@ -35,8 +34,9 @@ graph_input.edbl_lvls <- function(input, prov, name, class, ...) {
   prov$append_fct_nodes(name = name, role = class, attrs = fattrs)
   lattrs <- vec_data(input)
   value <- lattrs$..value..
-  lattrs <- lattrs[setdiff(names(lattrs), "..value..")]
-  prov$append_lvl_nodes(value = value, fid = prov$fct_id(name = name), attrs = lattrs)
+  n <- lattrs$..n..
+  lattrs <- lattrs[setdiff(names(lattrs), c("..value..", "..n.."))]
+  prov$append_lvl_nodes(value = value, n = n, fid = prov$fct_id(name = name), attrs = lattrs)
 }
 
 graph_input.formula <- function(input, prov, name, class, ...) {
@@ -78,7 +78,7 @@ graph_input.nest_lvls <- function(input, prov, name, class, ...) {
   plevels <- rep(names(input), lengths(input))
   clevels <- unname(unlist(input))
   pids <- prov$lvl_id(value = plevels, fid = idp)
-  prov$append_lvl_nodes(value = clevels, fid = idv)
+  prov$append_lvl_nodes(value = clevels, fid = idv, label = unname(unlist(clabels)))
   vids <- prov$lvl_id(value = clevels, fid = idv)
   prov$append_lvl_edges(from = pids, to = vids)
 
@@ -92,3 +92,34 @@ graph_input.nest_lvls <- function(input, prov, name, class, ...) {
     }
   }
 }
+
+
+
+graph_input.cond_lvls <- function(input, prov, name, class, ...) {
+  parent <- input %@% "keyname"
+  cross_parents <- input %@% "parents"
+  clabels <- input %@% "labels"
+  attrs <- NULL # attributes(input)
+  prov$append_fct_nodes(name = name, role = class)
+  idp <- prov$fct_id(name = parent)
+  idv <- prov$fct_id(name = name)
+  prov$append_fct_edges(from = idp, to = idv, type = "nest")
+  plevels <- rep(names(input), lengths(input))
+  clevels <- unname(unlist(input))
+  pids <- prov$lvl_id(value = plevels, fid = idp)
+  ## unique(clevels) is the only part that's different to nest_lvls
+  prov$append_lvl_nodes(value = unique(clevels), fid = idv)
+  vids <- prov$lvl_id(value = clevels, fid = idv)
+  prov$append_lvl_edges(from = pids, to = vids)
+
+  if(!is_null(cross_parents)) {
+    cross_df <- do.call("rbind", cross_parents[names(input)])
+    cross_parent_names <- colnames(cross_df)
+    for(across in cross_parent_names) {
+      prov$append_fct_edges(from = prov$fct_id(name = across), to = idv, type = "cross")
+      cpids <- prov$lvl_id(value = cross_df[[across]])
+      prov$append_lvl_edges(from = cpids, to = vids)
+    }
+  }
+}
+

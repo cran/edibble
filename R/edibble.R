@@ -75,6 +75,9 @@ is_cross_levels <- function(x) {
   inherits(x, "cross_lvls")
 }
 
+
+
+
 # `get` functions ---------------------------------------------------------
 
 #' @rdname design-helpers
@@ -122,16 +125,15 @@ not_edibble <- function(x) {
 #'
 #' @param .data data frame or list of the same size.
 #' @param ... Passed to `new_tibble`.
-#' @param design An edibble graph object.
-#' @param class Subclasses for edibble table. The default is NULL.
-#' @inheritParams design
+#' @param .design An edibble graph object.
+#' @param .class Subclasses for edibble table. The default is NULL.
 #' @importFrom tibble new_tibble
 #' @importFrom vctrs vec_size_common
 #' @return An edibble table.
 #' @export
-new_edibble <- function(.data, ..., design = NULL, class = NULL) {
+new_edibble <- function(.data, ..., .design = NULL, .class = NULL) {
   new_tibble(.data, ..., nrow = vec_size_common(!!!.data),
-             class = c(class, "edbl_table", "edbl"), design = design)
+             class = c(.class, "edbl_table", "edbl"), design = .design)
 }
 
 
@@ -151,6 +153,7 @@ new_trackable <- function(internal_cmd = character(),
 }
 
 #' @export
+
 tbl_sum.trck_table <- function(x) {
   c("A tracking table" = dim_desc(x),
     "External command" = attr(x, "external_cmd"),
@@ -181,16 +184,20 @@ as_edibble <- function(.data, ...) {
 }
 
 #' @export
-as_edibble.default <- function(.data, ...) {
-  edibble(.data, ...)
+as_edibble.data.frame <- function(.data, .title = NULL, ..., .name = "edibble", .record = TRUE, .seed = NULL, .provenance = Provenance$new(), .units = NULL, .trts = NULL) {
+  if(.record) .provenance$record_step()
+  des <- design(.title = .title, ..., .name = .name, .record = FALSE, .seed = .seed, .provenance = .provenance)
+  new_edibble(.data, .design = des) %>%
+    set_units({{.units}}) %>%
+    set_trts({{.trts}})
 }
 
-#' @rdname new_edibble
-#' @export
+# idk what's the point of this function
+# should this be removed?
 edibble <- function(.data, title = NULL, name = "edibble", .record = TRUE, seed = NULL, provenance = Provenance$new(), ...) {
   if(.record) provenance$record_step()
   des <- design(title = title, name = name, .record = FALSE, seed = seed, provenance = provenance)
-  new_edibble(.data, ..., design = des)
+  new_edibble(.data, ..., .design = des)
 }
 
 

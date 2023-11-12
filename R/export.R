@@ -63,7 +63,24 @@ export_design <- function(.data,
   add_worksheets(wb, sheet_names, title)
   add_creator(wb, author)
 
-  write_title_sheet(wb, sheet_names[1], title, author, date)
+  des <- edbl_design(.data)
+  context <- des$context
+  write_title_sheet(wb, sheet_names[1], title, author, date, context)
+
+  protect_properties <- c("formatCells",
+                          "formatColumns",
+                          "formatRows",
+                          "insertRows",
+                          "deleteColumns",
+                          "deleteRows",
+                          "sort",
+                          "autoFilter",
+                          "pivotTables",
+                          "objects",
+                          "scenarios")
+  wb$protect_worksheet(sheet = sheet_names[1],
+                       protect = TRUE,
+                       properties = protect_properties)
 
   write_data_sheet(wb, sheet_names[-c(1, 2, length(sheet_names))], prov,
                    as_tibble(.data), table_style, hide_treatments)
@@ -74,17 +91,7 @@ export_design <- function(.data,
 
   wb$protect_worksheet(sheet = sheet_names[2],
                        protect = TRUE,
-                       properties = c("formatCells",
-                                      "formatColumns",
-                                      "formatRows",
-                                      "insertRows",
-                                      "deleteColumns",
-                                      "deleteRows",
-                                      "sort",
-                                      "autoFilter",
-                                      "pivotTables",
-                                      "objects",
-                                      "scenarios"))
+                       properties = protect_properties)
 
   write_variables_sheet(wb, sheet_names[length(sheet_names)], prov, .data)
 
@@ -106,7 +113,7 @@ make_sheet_names <- function(prov) {
   } else {
     map_rcrd_to_unit <- prov$mapping("edbl_rcrd", "edbl_unit")
     map_trt_to_unit <- prov$mapping("edbl_trt", "edbl_unit")
-    uname <- prov$fct_names(id = unique(c(map_rcrd_to_unit)))
+    uname <- prov$fct_names(id = unique(c(map_rcrd_to_unit, map_trt_to_unit)))
   }
   data_sheet_names <- data_sheet_name(uname)
   names(data_sheet_names) <- uname
@@ -129,22 +136,25 @@ add_worksheets <- function(wb, sheet_names, title) {
 save_workbook <- function(wb, file, overwrite, title) {
   tryCatch(wb$save(file = file, overwrite = overwrite),
            error = function(e) {
-             cli::cli_alert_warning("Something went wrong. {.emph {title}} failed to be exported.")
+             cli::cli_abort("Something went wrong. {.emph {title}} failed to be exported.")
            })
   cli::cli_alert_success("{.emph {title}} has been written to {.file {file}}")
 }
 
 
-write_title_sheet <- function(wb, sheet_name, title, author, date) {
+write_title_sheet <- function(wb, sheet_name, title, author, date, context) {
+  metadata <- data.frame(name = c("title", "date", "author", names(context)),
+                         value = c(title, format(date), author %||% "unknown",
+                                   unname(map_chr(context, function(x) paste(x, collapse = ";")))))
+
   # title
-  title_pos <- openxlsx2::wb_dims(from_row = 1, from_col = 1)
+  title_pos <- openxlsx2::wb_dims(from_row = 1, from_col = 2)
   wb$set_col_widths(sheet = sheet_name,
-                    cols = 1,
+                    cols = 2,
                     widths = 100) # 250 is max
   wb$add_data(sheet = sheet_name,
-              x = title,
-              dims = title_pos,
-              name = "title",
+              x = metadata,
+              name = "metadata",
               col_names = FALSE)
   wb$add_font(sheet = sheet_name,
               dims = title_pos,
@@ -155,12 +165,7 @@ write_title_sheet <- function(wb, sheet_name, title, author, date) {
                     wrap_text = TRUE)
 
   # date
-  date_pos <- openxlsx2::wb_dims(from_row = 2, from_col = 1)
-  wb$add_data(sheet = sheet_name,
-              x = date,
-              dims = date_pos,
-              name = "date",
-              col_names = FALSE)
+  date_pos <- openxlsx2::wb_dims(from_row = 2, from_col = 2)
   wb$add_font(sheet = sheet_name,
               dims = date_pos,
               size = 25)
@@ -168,18 +173,10 @@ write_title_sheet <- function(wb, sheet_name, title, author, date) {
                     dims = date_pos,
                     horizontal = "left")
 
-  # author
-  if(!is_null(author)) {
-    author_pos <- openxlsx2::wb_dims(from_row = 3, from_col = 1)
-    wb$add_data(sheet = sheet_name,
-                x = author,
-                dims = author_pos,
-                name = "author",
-                col_names = FALSE)
-    wb$add_font(sheet = sheet_name,
-                dims = author_pos,
-                size = 25)
-  }
+  author_pos <- openxlsx2::wb_dims(from_row = 3, from_col = 2)
+  wb$add_font(sheet = sheet_name,
+              dims = author_pos,
+              size = 25)
 
 }
 
@@ -200,7 +197,6 @@ add_creator <- function(wb, authors) {
 
 write_data_sheet <- function(wb, sheet_names, prov, data, table_style, hide_treatments) {
   for(iunit in seq_along(sheet_names)) {
-
     if(prov$rcrd_exists(abort = FALSE)) {
       uid <- prov$fct_id(name = names(sheet_names)[iunit])
       data <- as_tibble.edbl_table(prov$serve_units(id = uid, return = "value"))
@@ -214,9 +210,7 @@ write_data_sheet <- function(wb, sheet_names, prov, data, table_style, hide_trea
         data[[prov$fct_names(id = rid)]] <- NA
       }
     }
-
     write_data_table(wb, sheet_names[iunit], data, table_style)
-
   }
 }
 

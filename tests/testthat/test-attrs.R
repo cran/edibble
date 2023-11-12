@@ -9,6 +9,7 @@ test_that("check lvls works", {
   des3 <- set_trts(diet = fct_attrs(lvls(value = c("A", "B", "C"),
                                          data = trtinfo)))
   out <- list(diet = tibble::tibble(value = LETTERS[1:3],
+                                    n = NA_integer_,
                                     attrs = trtinfo))
 
   trtinfo$value <- LETTERS[1:3]
@@ -30,6 +31,7 @@ test_that("check lvls works", {
                              height = attrs_lvls$height)) %>%
     lvl_nodes() %>%
     expect_equal(c(out, list(subject = tibble::tibble(value = 1:6,
+                                                      n = NA_integer_,
                                                       attrs = attrs_lvls))))
 
 
@@ -43,7 +45,25 @@ test_that("check fct_attrs works", {
                                         label = "Exercise"))
   expect_equal(fct_nodes(des0), tibble::tibble(name = c("diet", "exercise"),
                                                role = "edbl_trt",
+                                               n = c(3, 2),
                                                attrs = data.frame(desc = c("human diet", NA),
                                                                   label = c(NA, "Exercise"))))
+
+})
+
+
+test_that("lvls works", {
+  expect_error(lvls(value = sample(c("A", "A", "B", "B", "C"))))
+})
+
+
+test_that("context works", {
+  des <- design() %>%
+    set_units(unit = 20) %>%
+    set_trts(trt = 4)
+
+  set_attrs(des, design(author = "Emi Tanaka", email = "emi.tanaka@anu.edu.au"))
+  set_attrs(des, unit = fct(dim = 3))
+  set_attrs(des, trt = lvls(n = 3, cost = c(3, 4, 5, 8)))
 
 })

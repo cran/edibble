@@ -9,10 +9,10 @@
 #' @param ... Any other arguments parsed to `dae::designAnatomy`.
 #' @examples
 #' split <- takeout(menu_split(t1 = 3, t2 = 2, r = 2))
-#' anatomy(split)
+#' design_anatomy(split)
 #' @return An object of class "des_anatomy".
 #' @export
-anatomy <- function(.edibble, ...) {
+design_anatomy <- function(.edibble, ...) {
   des <- edbl_design(.edibble)
   tab <- edbl_table(.edibble)
   prov <- activate_provenance(des)

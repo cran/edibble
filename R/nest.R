@@ -1,4 +1,10 @@
-#' Specify the nesting structure for units
+#' Specify the nesting or conditional structure for units or treatments
+#'
+#' Conditional treatment is different to nested units as the levels are assumed to be
+#' distinct for the latter but not for the former.
+#'
+#' Currently when specifying conditional treatment, only character vectors
+#' are accepted on the RHS.
 #'
 #' @param x The name of the parent unit to nest under.
 #' @param ... a single number OR a sequence of two-sided formula where the
@@ -84,3 +90,32 @@ nesting_structure <- function(design) {
 }
 
 
+
+#' @rdname nested_in
+#' @export
+conditioned_on <- function(x, ...) {
+  top <- caller_env()$.top_env
+  if(is.null(top$.fname)) abort("The `conditioned_on` function must be used within `set_trts` function.")
+  prov <- top$prov
+  vlevs <- prov$fct_levels(return = "value")
+  parent_name <- as_string(enexpr(x))
+  parent_vlevels <- vlevs[[parent_name]]
+  dots <- list2(...)
+  m <-  length(parent_vlevels)
+  vals <- vector(mode = "list", length = m)
+  names(vals) <- parent_vlevels
+  done <- rep(FALSE, m)
+  for(pair in dots) {
+    epair <- eval_formula(pair, caller_env())
+    if(is_symbol(epair$lhs, name = ".")) {
+      vals[as.character(parent_vlevels[!done])] <- list(epair$rhs)
+    } else {
+      igroup <- match(epair$lhs, parent_vlevels)
+      done[igroup] <- TRUE
+      vals[as.character(epair$lhs)] <- list(epair$rhs)
+    }
+  }
+  attr(vals, "keyname") <- parent_name
+  class(vals) <- c("cond_lvls", "list")
+  return(vals)
+}

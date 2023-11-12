@@ -3,6 +3,11 @@ return_edibble_with_graph <- function(edibble, prov) {
   des <- edbl_design(edibble)
   des$graph <- prov$get_graph()
   des$validation <- prov$get_validation()
+  des$simulate <- prov$get_simulate()
+  sim_res <- ls(envir = prov$get_simulate_result_env(), all.names = TRUE)
+  if(length(sim_res)) {
+    des$simulate_result <- mget(sim_res, prov$get_simulate_result_env())
+  }
   if(is_edibble_table(edibble)) {
     attr(edibble, "design") <- des
     edibble
@@ -12,6 +17,18 @@ return_edibble_with_graph <- function(edibble, prov) {
 }
 
 
+eval_formula <- function(f, env) {
+  lhs <- f_lhs(f)
+  if(!is_formula(f) || is_null(lhs)) {
+    abort("Input must be two-sided formula.")
+  }
+  env <- f_env(f) %||% env
+  if(!is_symbol(lhs, name = ".")) {
+    lhs <- eval_tidy(lhs, env = env)
+  }
+  list(lhs = lhs,
+       rhs = eval_tidy(f_rhs(f), env = env))
+}
 
 
 
@@ -184,6 +201,11 @@ remove_nulls <- function(.x) {
   .x[!vapply(.x, is.null, logical(1))]
 }
 
+remove_empty_df <- function(.x) {
+  .x[vapply(.x, function(x) nrow(x) > 0, logical(1))]
+}
+
+
 
 compact <- function(.x) {
   .x[!vapply(.x, is_empty, logical(1))]
@@ -232,7 +254,8 @@ number_si_prefix <- function(x) {
     index <- max(which(n/prefix >= 1))
     scale <- 1 / prefix[index]
     symbol <- names(prefix)[index]
-    paste0(floor(n * scale), symbol)
+    nn <- round(n * scale)
+    ifelse(nn == n * scale, paste0(nn, symbol), paste0("~", nn, symbol))
   })
 }
 
@@ -263,7 +286,7 @@ as.data.frame.edbl_table <- function(x,
                                      levels_as = "factor",
                                      ignore_numeric = TRUE) {
   out <- lapply(x, function(.x) {
-    if(is_edibble_unit(.x) | is_edibble_trt(.x)) {
+    if(is_unit(.x) | is_trt(.x)) {
       if(ignore_numeric) {
         if(is.numeric(.x)) return(as.numeric(.x))
       }
@@ -285,14 +308,128 @@ append_recipe_code <- function(.design, new) {
 }
 
 add_edibble_code <- function(.edibble, code) {
-  if(!isFALSE(.edibble)) {
-    if(is_edibble_design(.edibble)) {
-      append_recipe_code(.edibble, code)
-    } else {
-      des <- edbl_design(.edibble) %>%
-        append_recipe_code(code)
-      attr(.edibble, "design") <- des
-      .edibble
+    if(!isFALSE(.edibble)) {
+      if(is_edibble_design(.edibble)) {
+        append_recipe_code(.edibble, code)
+      } else {
+        des <- edbl_design(.edibble) %>%
+          append_recipe_code(code)
+        attr(.edibble, "design") <- des
+        .edibble
+      }
+    }
+}
+
+
+#' Rescale a numerical vector
+#'
+#' Similar to [scales::rescale()] but it has a different
+#' behaviour when only upper or lower bound is given.
+#'
+#' @param x A numerical vector.
+#' @param lower The lower bound.
+#' @param upper The upper bound.
+#' @export
+rescale_values <- function(x, lower = NA, upper = NA) {
+  minx <- min(x, na.rm = TRUE)
+  maxx <- max(x, na.rm = TRUE)
+  if(is.na(lower) & is.na(upper)) return(x)
+  if(is.na(lower) & !is.na(upper)) {
+    shift <- maxx - upper
+    if(shift < 0) return(x)
+    return(x - shift + .Machine$double.xmin)
+  }
+  if(!is.na(lower) & is.na(upper)) {
+    shift <- minx - lower
+    if(shift >= 0) return(x)
+    return(x - shift + .Machine$double.xmin)
+  }
+  (x - minx) / (maxx - minx) * (upper - .Machine$double.xmin - lower) + lower + .Machine$double.xmin
+}
+
+#' @export
+print.edbl_fct <- function(x, ...) {
+  vctrs::obj_print(x)
+  invisible(x)
+}
+
+#' @export
+`+.edbl` <- function(e1, e2) {
+  if(missing(e2)) {
+    cli::cli_abort(c("Cannot use {.code +} with a single argument",
+                     i = "Did you accidentally put {.code +} on a new line?"))
+  }
+  prov1 <- activate_provenance(e1)
+  prov2 <- activate_provenance(e2)
+  # add factor nodes and edges from e2
+  fnodes2 <- prov2$fct_nodes
+  if(nrow(fnodes2)) {
+    prov1$append_fct_nodes(name = fnodes2$name,
+                           role = fnodes2$role,
+                           attrs = fnodes2$attrs)
+  }
+  fedges2 <- prov2$fct_edges
+  if(nrow(fedges2)) {
+    from1 <- prov1$fct_id(name = prov2$fct_names(id = fedges2$from))
+    to1 <- prov1$fct_id(name = prov2$fct_names(id = fedges2$to))
+    needs_group_id <- !is.na(fedges2$group)
+    if(sum(needs_group_id)) {
+      prov1$append_fct_edges(from = from1[needs_group_id],
+                             to = to1[needs_group_id],
+                             type = fedges2$type[needs_group_id],
+                             group = TRUE,
+                             # FIXME: this needs to be modified if attrs is data.frame!
+                             attrs = fedges2$attrs[needs_group_id])
+    } else if(sum(!needs_group_id)) {
+      prov1$append_fct_edges(from = from1[!needs_group_id],
+                             to = to1[!needs_group_id],
+                             type = fedges2$type[!needs_group_id],
+                             group = FALSE,
+                             # FIXME: this needs to be modified if attrs is data.frame!
+                             attrs = fedges2$attrs[!needs_group_id])
     }
   }
+  # add level nodes and edges from e2
+  missing_cols <- function(col, df) {
+    if(col %in% colnames(df)) {
+      ret <- lnode[[col]]
+    } else {
+      ret <- NULL
+    }
+    ret
+  }
+
+  lnodes2 <- prov2$lvl_nodes
+  if(length(lnodes2)) {
+    for(cfid in names(lnodes2)) {
+      fname <- prov2$fct_names(id = as.numeric(cfid))
+      fid <- prov1$fct_id(name = fname)
+      lnode <- lnodes2[[cfid]]
+      prov1$append_lvl_nodes(value = lnode$value,
+                             n = missing_cols("n", lnode),
+                             attrs = missing_cols("attrs", lnode),
+                             label = missing_cols("label", lnode),
+                             fid = fid)
+    }
+  }
+  ledges2 <- lvl_edges(e2)
+  if(!is.null(ledges2)) {
+    for(lnode in ledges2) {
+      from <- prov1$lvl_id(value = lnode$val_from, fid = prov1$fct_id(name = lnode$var_from[1]))
+      to <- prov1$lvl_id(value = lnode$val_to, fid = prov1$fct_id(name = lnode$var_to[1]))
+      prov1$append_lvl_edges(from = from,
+                             to = to,
+                             attrs = lnode$attrs)
+    }
+  }
+
+  # TODO: add these components when adding design
+  # validation,
+  # anatomy,
+  # simulate,
+  # context
+  e1 <- return_edibble_with_graph(e1, prov1)
+  des2 <- edbl_design(e2)
+  for(code in des2$recipe[-1]) e1 <- add_edibble_code(e1, code)
+  e1
 }

@@ -4,7 +4,8 @@
 #' @description
 #' This function creates new nodes to edibble graph with the name
 #' corresponding to either the intended response that will be measured or
-#' a variable to be recorded.
+#' a variable to be recorded. Avoid record names staring with a "." as these
+#' are reserved for other purposes downstream.
 #'
 #' @inheritParams set_units
 #' @param ... Name-value pair. The value should correspond to a single name of the
@@ -35,8 +36,12 @@ set_rcrds <- function(.edibble, ...,
     })
 
   rcrds <- names(units)
-
   prov$fct_exists(name = unlist(units), role = "edbl_unit")
+
+  # fix names
+  fnames_old <- prov$fct_nodes$name
+  fnames <- vec_as_names(c(fnames_old, rcrds), repair = .name_repair)
+  rcrds <- fnames[(length(fnames_old) + 1):length(fnames)]
 
   for(i in seq_along(units)) {
     prov$append_fct_nodes(name = rcrds[i], role = "edbl_rcrd")
@@ -46,15 +51,15 @@ set_rcrds <- function(.edibble, ...,
   }
 
   if(is_edibble_table(.edibble)) {
-    rcrds <- prov$serve_rcrds(return = "value")
-    for(arcrd in names(rcrds)) {
-      if(arcrd %in% names(.edibble)) {
+    #rcrds <- prov$serve_rcrds(return = "value")
+    for(arcrd in rcrds) {
+      if(!arcrd %in% names(.edibble)) {
         uid <- prov$mapping_to_unit(id = prov$fct_id(name = arcrd))
         uname <- prov$fct_names(id = uid)
-        uids <- prov$fct_id(name = .edibble[[uname]])
+        uids <- prov$lvl_id(value = .edibble[[uname]], fid = uid)
         .edibble[[arcrd]] <- new_edibble_rcrd(rep(NA_real_, nrow(.edibble)), uids)
       } else {
-        .edibble[[arcrd]] <- rcrds[[arcrd]]
+        .edibble[[arcrd]] <- new_edibble_rcrd(.edibble[[arcrd]])
       }
     }
   }
@@ -317,7 +322,7 @@ pillar_shaft.edbl_rcrd <- function(x, ...) {
     out <- rep(dup_symbol(), n)
     loc <- match(unique(uvals), uvals)
     out[loc] <- fill_symbol()
-    new_pillar_shaft_simple(out, align = "right")
+    new_pillar_shaft_simple(out, align = "right", min_width = 8)
   } else {
     pillar::pillar_shaft(unclass(x))
   }
@@ -334,7 +339,7 @@ as.character.edbl_rcrd <- function(x, ...) {
 #' @importFrom vctrs vec_ptype_abbr
 #' @export
 vec_ptype_abbr.edbl_rcrd <- function(x, ...)  {
-  "rcrd"
+  paste0("R(", number_si_prefix(length(unique(attr(x, "unit_values")))), ")")
 }
 
 #' @importFrom vctrs vec_ptype_full

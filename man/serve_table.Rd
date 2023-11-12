@@ -6,7 +6,7 @@
 \usage{
 serve_table(
   .edibble,
-  use_labels = FALSE,
+  label_nested = NULL,
   fail = c("error", "warn", "ignore"),
   .record = TRUE
 )
@@ -16,7 +16,7 @@ serve_table(
 object that contains the edibble data frame in the attribute
 \code{design}.}
 
-\item{use_labels}{To show the labels instead of names.}
+\item{label_nested}{The columns to show nested labels (if available). Tidyselect compatible.}
 
 \item{fail}{What to do when failing to convert graph to table.}
 

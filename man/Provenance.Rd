@@ -48,12 +48,14 @@ Remember that there could be more than one order.}
 \item \href{#method-Provenance-set_title}{\code{Provenance$set_title()}}
 \item \href{#method-Provenance-set_name}{\code{Provenance$set_name()}}
 \item \href{#method-Provenance-set_validation}{\code{Provenance$set_validation()}}
+\item \href{#method-Provenance-set_simulate}{\code{Provenance$set_simulate()}}
 \item \href{#method-Provenance-reactivate}{\code{Provenance$reactivate()}}
 \item \href{#method-Provenance-deactivate}{\code{Provenance$deactivate()}}
 \item \href{#method-Provenance-fct_id}{\code{Provenance$fct_id()}}
 \item \href{#method-Provenance-fct_id_parent}{\code{Provenance$fct_id_parent()}}
 \item \href{#method-Provenance-fct_id_child}{\code{Provenance$fct_id_child()}}
 \item \href{#method-Provenance-fct_id_ancestor}{\code{Provenance$fct_id_ancestor()}}
+\item \href{#method-Provenance-fct_id_descendant}{\code{Provenance$fct_id_descendant()}}
 \item \href{#method-Provenance-fct_id_leaves}{\code{Provenance$fct_id_leaves()}}
 \item \href{#method-Provenance-lvl_id}{\code{Provenance$lvl_id()}}
 \item \href{#method-Provenance-lvl_id_parent}{\code{Provenance$lvl_id_parent()}}
@@ -66,6 +68,7 @@ Remember that there could be more than one order.}
 \item \href{#method-Provenance-unit_names}{\code{Provenance$unit_names()}}
 \item \href{#method-Provenance-trt_names}{\code{Provenance$trt_names()}}
 \item \href{#method-Provenance-rcrd_names}{\code{Provenance$rcrd_names()}}
+\item \href{#method-Provenance-rcrd_class}{\code{Provenance$rcrd_class()}}
 \item \href{#method-Provenance-lvl_values}{\code{Provenance$lvl_values()}}
 \item \href{#method-Provenance-unit_values}{\code{Provenance$unit_values()}}
 \item \href{#method-Provenance-trt_values}{\code{Provenance$trt_values()}}
@@ -86,6 +89,7 @@ Remember that there could be more than one order.}
 \item \href{#method-Provenance-serve_units}{\code{Provenance$serve_units()}}
 \item \href{#method-Provenance-serve_trts}{\code{Provenance$serve_trts()}}
 \item \href{#method-Provenance-serve_rcrds}{\code{Provenance$serve_rcrds()}}
+\item \href{#method-Provenance-make_trts_table}{\code{Provenance$make_trts_table()}}
 \item \href{#method-Provenance-graph_subset}{\code{Provenance$graph_subset()}}
 \item \href{#method-Provenance-save_seed}{\code{Provenance$save_seed()}}
 \item \href{#method-Provenance-get_title}{\code{Provenance$get_title()}}
@@ -95,10 +99,16 @@ Remember that there could be more than one order.}
 \item \href{#method-Provenance-get_seed}{\code{Provenance$get_seed()}}
 \item \href{#method-Provenance-get_session_info}{\code{Provenance$get_session_info()}}
 \item \href{#method-Provenance-get_edibble_version}{\code{Provenance$get_edibble_version()}}
+\item \href{#method-Provenance-get_simulate}{\code{Provenance$get_simulate()}}
+\item \href{#method-Provenance-get_simulate_result_env}{\code{Provenance$get_simulate_result_env()}}
 \item \href{#method-Provenance-mapping}{\code{Provenance$mapping()}}
 \item \href{#method-Provenance-mapping_to_unit}{\code{Provenance$mapping_to_unit()}}
 \item \href{#method-Provenance-record_step}{\code{Provenance$record_step()}}
+\item \href{#method-Provenance-lvl_mapping}{\code{Provenance$lvl_mapping()}}
 \item \href{#method-Provenance-record_track_external}{\code{Provenance$record_track_external()}}
+\item \href{#method-Provenance-fct_id_links}{\code{Provenance$fct_id_links()}}
+\item \href{#method-Provenance-fct_graph_components}{\code{Provenance$fct_graph_components()}}
+\item \href{#method-Provenance-lvl_graph_components}{\code{Provenance$lvl_graph_components()}}
 \item \href{#method-Provenance-clone}{\code{Provenance$clone()}}
 }
 }
@@ -173,6 +183,27 @@ Set the validation.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-set_simulate"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-set_simulate}{}}}
+\subsection{Method \code{set_simulate()}}{
+Set the simulation process
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$set_simulate(name, process, rcrds)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{The name of the process}
+
+\item{\code{process}}{A function to simulate the record}
+
+\item{\code{rcrds}}{The record factor name simulating for.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Provenance-reactivate"></a>}}
 \if{latex}{\out{\hypertarget{method-Provenance-reactivate}{}}}
 \subsection{Method \code{reactivate()}}{
@@ -180,7 +211,8 @@ Reactivate the graph in the provenance object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Provenance$reactivate(
   design,
-  overwrite = c("graph", "anatomy", "recipe", "validation")
+  overwrite = c("graph", "anatomy", "recipe", "validation", "simulate",
+    "simualte_result")
 )}\if{html}{\out{</div>}}
 }
 
@@ -238,7 +270,7 @@ If none supplied then it will give all.
 \subsection{Method \code{fct_id_parent()}}{
 Get the factor parent ids
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Provenance$fct_id_parent(id = NULL, role = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$fct_id_parent(id = NULL, role = NULL, type = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -247,6 +279,8 @@ Get the factor parent ids
 \item{\code{id}}{The id of the corresponding node.}
 
 \item{\code{role}}{The role for the node.}
+
+\item{\code{type}}{The type of edge link.}
 }
 \if{html}{\out{</div>}}
 }
@@ -278,6 +312,25 @@ supplied then the child has to fit \code{role}
 Get the factor ancestor ids
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Provenance$fct_id_ancestor(id = NULL, role = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{id}}{The id of the corresponding node.}
+
+\item{\code{role}}{The role for the node.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-fct_id_descendant"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-fct_id_descendant}{}}}
+\subsection{Method \code{fct_id_descendant()}}{
+Get the factor descendant ids
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$fct_id_descendant(id = NULL, role = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -507,6 +560,23 @@ Get the record names.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{id}}{The id of the corresponding node.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-rcrd_class"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-rcrd_class}{}}}
+\subsection{Method \code{rcrd_class()}}{
+Get the class for record with validation.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$rcrd_class(name = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{The name of the node.}
 }
 \if{html}{\out{</div>}}
 }
@@ -797,13 +867,23 @@ Given node data, append the factor nodes
 \subsection{Method \code{append_lvl_nodes()}}{
 Given node data, append the level nodes
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Provenance$append_lvl_nodes(value, attrs = NULL, fid = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$append_lvl_nodes(
+  value,
+  n = NULL,
+  label = NULL,
+  attrs = NULL,
+  fid = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{value}}{The value of the node.}
+
+\item{\code{n}}{The number of replications.}
+
+\item{\code{label}}{The labels for the levels.}
 
 \item{\code{attrs}}{The attributes.}
 
@@ -818,7 +898,7 @@ Given node data, append the level nodes
 \subsection{Method \code{append_fct_edges()}}{
 Given edge data, append the factor edges
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Provenance$append_fct_edges(from, to, type = NULL, group = NULL, attrs = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$append_fct_edges(from, to, type = NULL, group = FALSE, attrs = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -830,7 +910,7 @@ Given edge data, append the factor edges
 
 \item{\code{type}}{The type of edges.}
 
-\item{\code{group}}{The group id.}
+\item{\code{group}}{A logical value to indicate whether to create new group id or not.}
 
 \item{\code{attrs}}{The attributes.}
 }
@@ -916,6 +996,28 @@ Serve records
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-make_trts_table"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-make_trts_table}{}}}
+\subsection{Method \code{make_trts_table()}}{
+Make the treatments table
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$make_trts_table(id = NULL, return = c("id", "value"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{id}}{The id of the corresponding node.}
+
+\item{\code{return}}{To return in "id" or "value" format.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A treatment table
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Provenance-graph_subset"></a>}}
 \if{latex}{\out{\hypertarget{method-Provenance-graph_subset}{}}}
 \subsection{Method \code{graph_subset()}}{
@@ -948,13 +1050,15 @@ subsetted graph
 \subsection{Method \code{save_seed()}}{
 Save the seed
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Provenance$save_seed(seed)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$save_seed(seed, type)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{seed}}{A seed.}
+
+\item{\code{type}}{Type.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1037,6 +1141,40 @@ Get the edibble version.
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-get_simulate"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-get_simulate}{}}}
+\subsection{Method \code{get_simulate()}}{
+Get the simulation information
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$get_simulate(name = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{The process name. Only one name allowed.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-get_simulate_result_env"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-get_simulate_result_env}{}}}
+\subsection{Method \code{get_simulate_result_env()}}{
+Get the simulation results
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$get_simulate_result_env(name = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{The process name. Only one name allowed.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Provenance-mapping"></a>}}
 \if{latex}{\out{\hypertarget{method-Provenance-mapping}{}}}
 \subsection{Method \code{mapping()}}{
@@ -1083,6 +1221,25 @@ Record step.
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-lvl_mapping"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-lvl_mapping}{}}}
+\subsection{Method \code{lvl_mapping()}}{
+Get the level edges by factor
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$lvl_mapping(from, to, return = c("vector", "table"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{from, to}}{The factor id.}
+
+\item{\code{return}}{To return in "id" or "value" format.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Provenance-record_track_external"></a>}}
 \if{latex}{\out{\hypertarget{method-Provenance-record_track_external}{}}}
 \subsection{Method \code{record_track_external()}}{
@@ -1098,6 +1255,57 @@ Record track external.
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-fct_id_links"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-fct_id_links}{}}}
+\subsection{Method \code{fct_id_links()}}{
+Find all id that is linked.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$fct_id_links(id = NULL, role = NULL, link = c("direct", "indirect"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{id}}{The id of the corresponding node.}
+
+\item{\code{role}}{The role for the node.}
+
+\item{\code{link}}{Whether the link should be direct or indirect}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+id of linked factors, excluding itself.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-fct_graph_components"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-fct_graph_components}{}}}
+\subsection{Method \code{fct_graph_components()}}{
+Get the nodes with components (subgraph number)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$fct_graph_components(id = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{id}}{The id of the corresponding node.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Provenance-lvl_graph_components"></a>}}
+\if{latex}{\out{\hypertarget{method-Provenance-lvl_graph_components}{}}}
+\subsection{Method \code{lvl_graph_components()}}{
+Get the nodes with components (subgraph number)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Provenance$lvl_graph_components()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Provenance-clone"></a>}}

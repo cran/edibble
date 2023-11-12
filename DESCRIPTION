@@ -1,6 +1,6 @@
 Package: edibble
-Title: Designing Comparative Experiments
-Version: 1.0.0
+Title: Encapsulating Elements of Experimental Design
+Version: 1.1.0
 Authors@R: 
     person(given = "Emi",
            family = "Tanaka",
@@ -11,6 +11,7 @@ Description: A system to facilitate designing comparative experiments using the
   grammar of experimental designs <https://emitanaka.org/edibble-book/>. 
   An experimental design is treated as an intermediate, mutable object that is 
   built progressively by fundamental experimental components like units, treatments, and their relation.
+  The system aids in experimental planning, management and workflow.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -20,13 +21,13 @@ URL: https://edibble.emitanaka.org/,
         https://github.com/emitanaka/edibble
 BugReports: https://github.com/emitanaka/edibble/issues
 Imports: magrittr, rlang, vctrs, tibble, cli, pillar, tidyselect (>=
-        1.0.0), nestr, stats, AlgDesign, dae, R6
+        1.0.0), nestr, stats, AlgDesign, dae, R6, lifecycle
 Suggests: testthat (>= 3.0.0), rmarkdown, openxlsx2 (>= 1.0.0),
-        visNetwork
+        visNetwork, blocksdesign
 Depends: R (>= 2.10)
 NeedsCompilation: no
-Packaged: 2023-09-03 05:51:43 UTC; emitanaka
+Packaged: 2023-11-12 08:08:46 UTC; emitanaka
 Author: Emi Tanaka [aut, cre, cph] (<https://orcid.org/0000-0002-1455-259X>)
 Maintainer: Emi Tanaka <dr.emi.tanaka@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-09-03 06:10:02 UTC
+Date/Publication: 2023-11-12 09:23:21 UTC

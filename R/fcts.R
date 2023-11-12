@@ -22,7 +22,7 @@ set_fcts <- function(.edibble, ..., .class = NULL,
 
     dots <- enquos(..., .named = TRUE, .homonyms = "error", .check_assign = TRUE)
     fnames_new <- names(dots)
-    fnames_old <- names(prov$graph)
+    fnames_old <- prov$fct_nodes$name
     fnames <- vec_as_names(c(fnames_old, fnames_new), repair = .name_repair)
 
     for(i in seq_along(dots)) {
@@ -56,9 +56,12 @@ set_fcts <- function(.edibble, ..., .class = NULL,
 #' Constructor for an edibble variable
 #' @importFrom vctrs new_vctr
 #' @noRd
-new_edibble_fct <- function(labels = character(), levels = unique(labels),
+new_edibble_fct <- function(labels = character(), levels = as.character(unique(labels)),
                             name = character(), rep = NULL, ..., class = NULL) {
-  x <- new_vctr(labels, levels = levels, name = name,
+  # don't make the attribute name
+  # as this triggers the warning message in ggplot2:
+  # In attr(x, "n") : partial match of 'n' to 'name'
+  x <- new_vctr(labels, levels = levels, fname = name,
                 ..., class = c("edbl_fct", class(labels)))
   class(x) <- c(class, class(x))
   x
@@ -83,7 +86,7 @@ as.character.edbl_fct <- function(x, ...) {
   #unname(levels(x)[x])
   out <- unclass(x)
   attributes(out) <- NULL
-  out
+  as.character(out)
 }
 
 #' @export
@@ -101,7 +104,7 @@ as.integer.edbl_lvls <- function(x, ...) {
 #' @rdname utility-edibble-var
 #' @export
 as.integer.edbl_fct <- function(x, ...) {
-  out <- as.integer(as.factor(as.character(x)))
+  out <- as.integer(as.factor(as.character(unclass(x))))
   attributes(out) <- NULL
   out
 }
@@ -117,72 +120,132 @@ levels.edbl_fct <- function(x) {
 
 #' @rdname utility-edibble-var
 #' @export
-is_edibble_var <- function(x) {
+is_fct <- function(x) {
   inherits(x, "edbl_fct")
 }
 
 #' @rdname utility-edibble-var
 #' @export
-is_edibble_unit <- function(x) {
+is_unit <- function(x) {
   inherits(x, "edbl_unit")
 }
 
 #' @rdname utility-edibble-var
 #' @export
-is_edibble_trt <- function(x) {
+is_trt <- function(x) {
   inherits(x, "edbl_trt")
 }
 
 #' @rdname utility-edibble-var
 #' @export
-is_edibble_rcrd <- function(x) {
+is_rcrd <- function(x) {
   inherits(x, "edbl_rcrd")
 }
 
 
-#' @importFrom vctrs vec_math
-#' @export
-vctrs::vec_math
 
+
+
+#' @importFrom vctrs vec_math
 #' @method vec_math edbl_fct
 #' @export
 vec_math.edbl_fct <- function(.fn, .x, ...) {
   if(.fn %in% c("is.nan", "is.infinite")) return(rep_len(FALSE, length(.x)))
   if(.fn == "is.finite") return(rep_len(TRUE, length(.x)))
-  out <- lapply(as.character(.x), get(.fn), ...)
-  vctrs::vec_restore(out, .x)
+  get(.fn)(unclass(.x))
 }
 
+#' @importFrom vctrs vec_ptype2 vec_ptype2.double vec_ptype2.integer vec_ptype2.character
+#' @export
+vec_ptype2.edbl_unit.character <- function(x, y, ...) y
+#' @export
+vec_ptype2.character.edbl_unit <- function(x, y, ...) x
+#' @export
+vec_ptype2.edbl_unit.double <- function(x, y, ...) y
+#' @export
+vec_ptype2.double.edbl_unit <- function(x, y, ...) x
+#' @export
+vec_ptype2.edbl_unit.integer <- function(x, y, ...) y
+#' @export
+vec_ptype2.integer.edbl_unit <- function(x, y, ...) x
+#' @export
+vec_ptype2.edbl_unit.edbl_unit <- function(x, y, ...) x
 
-#' @importFrom vctrs vec_ptype2
 #' @export
-vec_ptype2.edbl_fct.character <- function(x, y, ...) character()
+vec_ptype2.edbl_trt.character <- function(x, y, ...) y
 #' @export
-vec_ptype2.character.edbl_fct <- function(x, y, ...) character()
+vec_ptype2.character.edbl_trt <- function(x, y, ...) x
 #' @export
-vec_ptype2.edbl_unit.character <- function(x, y, ...) character()
+vec_ptype2.edbl_trt.double <- function(x, y, ...) y
 #' @export
-vec_ptype2.character.edbl_unit <- function(x, y, ...) character()
+vec_ptype2.double.edbl_trt <- function(x, y, ...) x
 #' @export
-vec_ptype2.edbl_trt.character <- function(x, y, ...) character()
+vec_ptype2.edbl_trt.integer <- function(x, y, ...) y
 #' @export
-vec_ptype2.character.edbl_trt <- function(x, y, ...) character()
+vec_ptype2.integer.edbl_trt <- function(x, y, ...) x
 #' @export
+vec_ptype2.edbl_trt.edbl_trt <- function(x, y, ...) x
 
-#' @importFrom vctrs vec_cast
 #' @export
-vec_cast.edbl_fct.character <- function(x, to, ...) as.character(x)
+vec_ptype2.edbl_rcrd.character <- function(x, y, ...) y
 #' @export
-vec_cast.character.edbl_fct <- function(x, to, ...) x
+vec_ptype2.character.edbl_rcrd <- function(x, y, ...) x
 #' @export
-vec_cast.edbl_unit.character <- function(x, to, ...) as.character(x)
+vec_ptype2.edbl_rcrd.double <- function(x, y, ...) y
 #' @export
-vec_cast.character.edbl_unit <- function(x, to, ...) x
+vec_ptype2.double.edbl_rcrd <- function(x, y, ...) x
 #' @export
-vec_cast.edbl_trt.character <- function(x, to, ...) as.character(x)
+vec_ptype2.edbl_rcrd.integer <- function(x, y, ...) y
 #' @export
-vec_cast.character.edbl_trt <- function(x, to, ...) x
+vec_ptype2.integer.edbl_rcrd <- function(x, y, ...) x
+#' @export
+vec_ptype2.edbl_rcrd.edbl_rcrd <- function(x, y, ...) x
 
+#' @importFrom vctrs vec_cast vec_cast.double vec_cast.integer vec_cast.character
+#' @export
+vec_cast.edbl_trt.double <- function(x, to, ...) x
+#' @export
+vec_cast.double.edbl_trt <- function(x, to, ...) as.numeric(unclass(x))
+#' @export
+vec_cast.edbl_trt.integer <- function(x, to, ...) x
+#' @export
+vec_cast.integer.edbl_trt <- function(x, to, ...) as.integer(unclass(x))
+#' @export
+vec_cast.edbl_trt.character <- function(x, to, ...) x
+#' @export
+vec_cast.character.edbl_trt <- function(x, to, ...) as.character(unclass(x))
+#' @export
+vec_cast.edbl_trt.edbl_trt <- function(x, to, ...) x
+
+#' @export
+vec_cast.edbl_unit.double <- function(x, to, ...) x
+#' @export
+vec_cast.double.edbl_unit <- function(x, to, ...) as.numeric(unclass(x))
+#' @export
+vec_cast.edbl_unit.integer <- function(x, to, ...) x
+#' @export
+vec_cast.integer.edbl_unit <- function(x, to, ...) as.integer(unclass(x))
+#' @export
+vec_cast.edbl_unit.character <- function(x, to, ...) x
+#' @export
+vec_cast.character.edbl_unit <- function(x, to, ...) as.character(unclass(x))
+#' @export
+vec_cast.edbl_unit.edbl_unit <- function(x, to, ...) x
+
+#' @export
+vec_cast.edbl_rcrd.double <- function(x, to, ...) x
+#' @export
+vec_cast.double.edbl_rcrd <- function(x, to, ...) as.numeric(unclass(x))
+#' @export
+vec_cast.edbl_rcrd.integer <- function(x, to, ...) x
+#' @export
+vec_cast.integer.edbl_rcrd <- function(x, to, ...) as.integer(unclass(x))
+#' @export
+vec_cast.edbl_rcrd.character <- function(x, to, ...) x
+#' @export
+vec_cast.character.edbl_rcrd <- function(x, to, ...) as.character(unclass(x))
+#' @export
+vec_cast.edbl_rcrd.edbl_rcrd <- function(x, to, ...) x
 
 # ADDME add_units(exist = TRUE), reset_units(exist = FALSE)
 

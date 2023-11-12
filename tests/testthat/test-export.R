@@ -2,7 +2,7 @@ test_that("export with no record", {
   set.seed(1)
   des <- suppressMessages(takeout())
   fn <- tempfile()
-  suppressMessages(export_design(des, file = fn, overwrite = TRUE))
+  suppressMessages(export_design(des, file = fn, overwrite = TRUE, author = "Emi Tanaka"))
   dat <- openxlsx2::read_xlsx(fn, sheet = 2)
 
   expect_equal(dat, as_tibble(des), ignore_attr = TRUE)
@@ -41,8 +41,8 @@ test_that("export with record", {
                     mainplot = c("mainplot1", "mainplot1", "mainplot1", "mainplot2", "mainplot2",
                                  "mainplot2", "mainplot3", "mainplot3", "mainplot3", "mainplot4",
                                  "mainplot4", "mainplot4"),
-                    trt2 = c("trt21", "trt22", "trt23", "trt22", "trt21", "trt23", "trt22",
-                             "trt21", "trt23", "trt23", "trt22", "trt21"),
+                    trt2 = c("trt22", "trt21", "trt23", "trt22", "trt21", "trt23", "trt22",
+                             "trt21", "trt23", "trt22", "trt21", "trt23"),
                     height = NA_real_,
                     genotype = NA_real_)
   expect_equal(out2, dat, ignore_attr = TRUE)
