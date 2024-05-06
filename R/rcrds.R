@@ -19,10 +19,10 @@
 #'   set_rcrds_of(unit = "y")
 #' @return An edibble design.
 #' @export
-set_rcrds <- function(.edibble, ...,
+set_rcrds <- function(.edibble = NULL, ...,
                       .name_repair = c("check_unique", "unique", "universal", "minimal"),
                       .record = TRUE) {
-
+  if(is.null(.edibble)) return(structure(match.call(), env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
   not_edibble(.edibble)
   des <- edbl_design(.edibble)
   prov <- activate_provenance(des)
@@ -53,13 +53,14 @@ set_rcrds <- function(.edibble, ...,
   if(is_edibble_table(.edibble)) {
     #rcrds <- prov$serve_rcrds(return = "value")
     for(arcrd in rcrds) {
+      uid <- prov$mapping_to_unit(id = prov$fct_id(name = arcrd))
+      uname <- prov$fct_names(id = uid)
+      uids <- prov$lvl_id(value = attr(.edibble[[uname]], "label-non-nested") %||% .edibble[[uname]],
+                          fid = uid)
       if(!arcrd %in% names(.edibble)) {
-        uid <- prov$mapping_to_unit(id = prov$fct_id(name = arcrd))
-        uname <- prov$fct_names(id = uid)
-        uids <- prov$lvl_id(value = .edibble[[uname]], fid = uid)
         .edibble[[arcrd]] <- new_edibble_rcrd(rep(NA_real_, nrow(.edibble)), uids)
       } else {
-        .edibble[[arcrd]] <- new_edibble_rcrd(.edibble[[arcrd]])
+        .edibble[[arcrd]] <- new_edibble_rcrd(.edibble[[arcrd]], uids)
       }
     }
   }
@@ -69,7 +70,7 @@ set_rcrds <- function(.edibble, ...,
 
 #' @rdname set_rcrds
 #' @export
-set_rcrds_of <- function(.edibble, ...) {
+set_rcrds_of <- function(.edibble = NULL, ...) {
   unit2rcrd <- list2(...)
   units <- names(unit2rcrd)
   args <- list()
@@ -95,8 +96,18 @@ set_rcrds_of <- function(.edibble, ...) {
 #'   expect_rcrds(y > 0)
 #' @return An edibble design.
 #' @export
-expect_rcrds <- function(.edibble, ..., .record = TRUE) {
-  not_edibble(.edibble)
+expect_rcrds <- function(.edibble = NULL, ..., .record = TRUE) {
+  arg1 <- enquo(.edibble)
+  arg1 <- tryCatch(rlang::eval_tidy(arg1),
+           error = function(e) arg1)
+  if(is.null(arg1)) return(structure(match.call(), env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
+  if(!is_edibble(arg1)) {
+    cl <- match.call()
+    ncl <- length(cl)
+    cl[3:(ncl + 1)] <- cl[2:ncl]
+    cl$.edibble <- NULL
+    return(structure(cl, env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
+  }
   prov <- activate_provenance(.edibble)
   if(.record) prov$record_step()
   dots <- enquos(...)
@@ -339,7 +350,9 @@ as.character.edbl_rcrd <- function(x, ...) {
 #' @importFrom vctrs vec_ptype_abbr
 #' @export
 vec_ptype_abbr.edbl_rcrd <- function(x, ...)  {
-  paste0("R(", number_si_prefix(length(unique(attr(x, "unit_values")))), ")")
+  unit_values <- attr(x, "unit_values")
+  if(is.null(unit_values)) return("R")
+  paste0("R(", number_si_prefix(length(unique(unit_values))), ")")
 }
 
 #' @importFrom vctrs vec_ptype_full

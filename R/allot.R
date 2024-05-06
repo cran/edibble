@@ -22,9 +22,16 @@
 #' @return Return an edibble design.
 #' @seealso assign_fcts
 #' @export
-allot_trts <- function(.edibble, ..., .record = TRUE) {
+allot_trts <- function(.edibble = NULL, ..., .record = TRUE) {
+  if(is.null(.edibble)) return(structure(match.call(), env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
+  if(is_formula(.edibble)) {
+    cl <- match.call()
+    ncl <- length(cl)
+    cl[3:(ncl + 1)] <- cl[2:ncl]
+    cl$.edibble <- NULL
+    return(structure(cl, env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
+  }
   dots <- list2(...)
-  if(is.null(.edibble)) return(structure(dots, class = c("edbl_fn", "allot_trts")))
   not_edibble(.edibble)
   des <- edbl_design(.edibble)
   prov <- activate_provenance(des)
@@ -51,7 +58,20 @@ allot_trts <- function(.edibble, ..., .record = TRUE) {
       tids <- prov$trt_ids
     }
     prov$append_fct_edges(from = tids, to = uid, group = TRUE, type = "allot")
+
+    if(is.data.frame(.edibble)) {
+
+      uids_df <- prov$lvl_id(value = .edibble[[unit]], fid = uid)
+      for(itrt in seq_along(trts)) {
+        atrt <- trts[itrt]
+        tids_df <- prov$lvl_id(value = .edibble[[atrt]], fid = tids[itrt])
+        prov$append_lvl_edges(from = tids_df,
+                                to = uids_df)
+      }
+    }
   }
+
+
 
   return_edibble_with_graph(.edibble, prov)
 }
@@ -79,6 +99,14 @@ allot_trts <- function(.edibble, ..., .record = TRUE) {
 #' @seealso assign_fcts
 #' @export
 allot_units <- function(.edibble, ..., .record = TRUE) {
+  if(is.null(.edibble)) return(structure(match.call(), env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
+  if(is_formula(.edibble)) {
+    cl <- match.call()
+    ncl <- length(cl)
+    cl[3:(ncl + 1)] <- cl[2:ncl]
+    cl$.edibble <- NULL
+    return(structure(cl, env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
+  }
   dots <- list2(...)
   not_edibble(.edibble)
   prov <- activate_provenance(.edibble)
@@ -152,7 +180,15 @@ allot_units <- function(.edibble, ..., .record = TRUE) {
 #' @inheritParams assign_fcts
 #'
 #' @export
-allot_table <- function(.edibble, ..., order = "random", seed = NULL, constrain = nesting_structure(.edibble), label_nested = NULL, fail = "error", .record = TRUE) {
+allot_table <- function(.edibble = NULL, ..., order = "random", seed = NULL, constrain = nesting_structure(.edibble), label_nested = NULL, fail = "error", .record = TRUE) {
+  if(is.null(.edibble)) return(structure(match.call(), env = rlang::caller_env(), class = c("edbl_fn", "edbl")))
+  if(is_formula(.edibble)) {
+    cl <- match.call()
+    ncl <- length(cl)
+    cl[3:(ncl + 1)] <- cl[2:ncl]
+    cl$.edibble <- NULL
+    return(structure(cl, class = c("edbl_fn", "edbl")))
+  }
   prov <- activate_provenance(.edibble)
   if(.record) prov$record_step()
   .edibble %>%

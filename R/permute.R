@@ -1,16 +1,20 @@
 #' @export
-order_trts.blocksdesign <- function(x, trts_df, units_df, unit, vparents, prov, model = NULL, ...) {
+order_trts.blocksdesign <- function(x, trts_table, units_table, unit, constrain, prov, model = NULL, ...) {
   if(!requireNamespace("blocksdesign")) abort("You need to install `blocksdesign` package.")
-  udf <- units_df[, setdiff(names(units_df), as.character(unit)), drop = FALSE]
-  names(trts_df) <- paste0("T", 1:ncol(trts_df))
-  tlist <- lapply(trts_df, as.factor)
-  udf <- data.frame(lapply(udf, as.factor))
+  names(trts_table) <- paste0("T", 1:ncol(trts_table))
+  # drop any treatment factors that appear only once
+  tcount <- sapply(trts_table, function(x) length(unique(x)))
+  tlist <- lapply(trts_table[tcount > 1], as.factor)
+  if(length(tlist)==0) return(rep(1, nrow(units_table)))
+  # drop any unit factors that have completely distinct labels
+  ucount <- sapply(units_table, function(x) length(unique(x)))
+  udf <- data.frame(lapply(units_table[ucount < nrow(units_table)], as.factor))
   res <- blocksdesign::design(treatments = tlist, blocks = udf, treatments_model = model,
                               weighting = 0.5)
-  trts_df$..trtid.. <- 1:nrow(trts_df)
+  trts_table$..trtid.. <- 1:nrow(trts_table)
   out <- res$Design
   out$..id.. <- 1:nrow(out)
-  out <- merge(out, trts_df)
+  out <- merge(out, trts_table)
   out[order(out$..id..), "..trtid..", drop = TRUE]
 }
 
@@ -98,6 +102,13 @@ permute_parent_one_alg <- function(vid, udf, ntrts) {
   # in this case subtract total trts
   blocksizes_adj <- blocksizes
   blocksizes_adj[blocksizes > ntrts] <- blocksizes_adj[blocksizes > ntrts] %% ntrts
+  nB <- length(blocksizes_adj)
+  nBlock <- sum(blocksizes_adj)
+  # ALgDesign doesn't like it when the number of units is about the same as the number
+  # of blocks
+  if(nBlock < (ntrts - 1 + nB)) {
+    return(sample(rep(sample(1:ntrts), length.out = nrow(udf))))
+  }
   utils::capture.output({
     # prevent "No improvement over initial random design" print out from AlgDesign
     # where the design is balanced

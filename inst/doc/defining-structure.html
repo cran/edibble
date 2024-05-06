@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Defining structure</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Defining structure</h1>
+
+
+
+<p>In this vignette, we assume that the experimental aim is to find the
+best wheat variety from a wheat field trial.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(edibble)</span></code></pre></div>
+<div id="initialisation" class="section level2">
+<h2>Initialisation</h2>
+<p>A new design constructed using edibble must start by initialising the
+<em>design object</em>. An optional title of the design may be provided
+as input. This information persists as metadata in the object and is
+displayed in various places (e.g., print output and exported files).</p>
+<p>When you have no data, you start by simply initialising the design
+object.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">design</span>(<span class="st">&quot;Wheat field trial&quot;</span>)</span></code></pre></div>
+<p>At this point, there is nothing particularly interesting. The design
+object requires the user to define the experimental factor(s) as
+described next.</p>
+</div>
+<div id="units" class="section level2">
+<h2>Units</h2>
+<p>At minimum, the design requires units to be defined via
+<code>set_units</code>. In the code below, we initialise a new design
+object and then set a unit called “site” with 4 levels. The left hand
+side (LHS) and the right hand side (RHS) of the function input
+correspond to the factor name and the corresponding value, respectively.
+Here, the value is a single integer that denotes the number of levels of
+the factor. Note that the <em>LHS can be any arbitrary (preferably
+syntactically valid) name</em>. Selecting a name that succinctly
+describes the factor is recommended. Acronyms should be avoided where
+reasonable. We assign this design object to the variable called
+<code>demo</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span> <span class="fu">design</span>(<span class="st">&quot;Demo for defining units&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">site =</span> <span class="dv">4</span>)</span></code></pre></div>
+<p>At this point, the design is in a <em>graph form</em>. The print of
+this object shows a prettified tree that displays the title of the
+experiment, the factors, and their corresponding number of levels.
+Notice the root in this tree output corresponds to the title given in
+the object initialisation.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>demo</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; Demo for defining units</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; └─site (4 levels)</span></span></code></pre></div>
+<p>To obtain the <em>design table</em>, you must call on
+<code>serve_table</code> to signal that you wish the object to be
+transformed into the <em>tabular form</em>. The transformation for
+<code>demo</code> is shown below, where the output is a type of
+<code>tibble</code> with one column (the “site” factor), four rows
+(corresponding to the four levels in the site), and the entries
+corresponding to the actual levels of the factor (name derived as
+“site1”, “site2”, “site3”, and “site4” here). The first line of the
+print output is decorated with the title of the design object, which
+acts as a persistent reminder of the initial input. The row just under
+the header shows the role of the factor denoted by the upper case letter
+(here, U = unit) with the number of levels in that factor displayed. If
+the number of levels exceed a thousand, then the number is shown with an
+SI prefix rounded to the closest digit corresponding to the SI prefix
+form (e.g., 1000 is shown as 1k and 1800 is shown as ~2k). The row that
+follows shows the class of the factor (e.g., character or numeric).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">serve_table</span>(demo)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; # Demo for defining units </span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; # An edibble: 4 x 1</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt;     site</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;   &lt;U(4)&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; 1  site1</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 2  site2</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; 3  site3</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 4  site4</span></span></code></pre></div>
+<p>If particular names are desired for the levels, then the RHS value
+can be replaced with a vector like below where the levels are named
+“Narrabri”, “Horsham”, “Parkes” and “Roseworthy”.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">design</span>(<span class="st">&quot;Character vector input demo&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">site =</span> <span class="fu">c</span>(<span class="st">&quot;Narrabri&quot;</span>, <span class="st">&quot;Horsham&quot;</span>, <span class="st">&quot;Parkes&quot;</span>, <span class="st">&quot;Roseworthy&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="fu">serve_table</span>()</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; # Character vector input demo </span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; # An edibble: 4 x 1</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt;         site</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt;       &lt;U(4)&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt;        &lt;chr&gt;</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; 1   Narrabri</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; 2    Horsham</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; 3     Parkes</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; 4 Roseworthy</span></span></code></pre></div>
+<p>The RHS value in theory be any vector. Below the input is a numeric
+vector, and the corresponding output will be a <code>data.frame</code>
+with a numeric column.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">design</span>(<span class="st">&quot;Numeric vector input demo&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">site =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">serve_table</span>()</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; # Numeric vector input demo </span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; # An edibble: 4 x 1</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;     site</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt;   &lt;U(4)&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt;    &lt;dbl&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; 1      1</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; 2      2</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; 3      3</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; 4      4</span></span></code></pre></div>
+<p>In the instance that you do want to enter a single level with a
+numeric value, this can be specified using <code>lvls</code> on the
+RHS.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">design</span>(<span class="st">&quot;Single numeric level demo&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">site =</span> <span class="fu">lvls</span>(<span class="dv">4</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="fu">serve_table</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; # Single numeric level demo </span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; # An edibble: 1 x 1</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;     site</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt;   &lt;U(1)&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt;    &lt;dbl&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; 1      4</span></span></code></pre></div>
+<div id="multiple-units" class="section level3">
+<h3>Multiple units</h3>
+<p>We can add more unit factors to this study. Suppose that we have 72
+plots. We append another call to <code>set_units</code> to encode this
+information.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>demo2 <span class="ot">&lt;-</span> demo <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">plot =</span> <span class="dv">72</span>)</span></code></pre></div>
+<p>However, we did not defined the relationship between
+<code>site</code> and <code>plot</code>; so it fails to convert to the
+tabular form.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">serve_table</span>(demo2)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; Error in `serve_table()`:</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; ! The graph cannot be converted to a table format.</span></span></code></pre></div>
+<p>The relationship between unit factors can be defined concurrently
+when defining the unit factors using helper functions. One of these
+helper functions is demonstrated next.</p>
+</div>
+<div id="sec-nested" class="section level3">
+<h3>Nested units</h3>
+<p>Given that we have a wheat trial, we imagine that the site
+corresponds to the locations, and each location would have its own
+plots. The experimenter tells you that each site contains 18 plots. This
+nesting structure can be defined by using the helper function
+<code>nested_in</code>. With this relationship specified, the graph can
+be reconciled into a tabular format, as shown below.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>demo <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">plot =</span> <span class="fu">nested_in</span>(site, <span class="dv">18</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">serve_table</span>()</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt; # Demo for defining units </span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; # An edibble: 72 x 2</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt;      site    plot</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt;    &lt;U(4)&gt; &lt;U(72)&gt;</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt;     &lt;chr&gt;   &lt;chr&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt;  1  site1  plot01</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt;  2  site1  plot02</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt;  3  site1  plot03</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt;  4  site1  plot04</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt;  5  site1  plot05</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt;  6  site1  plot06</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt;  7  site1  plot07</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt;  8  site1  plot08</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt;  9  site1  plot09</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt; 10  site1  plot10</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt; # ℹ 62 more rows</span></span></code></pre></div>
+<p>In the above situation, the relationship between unit factors have to
+be apriori known, but there are situations in which the relationship may
+become cognizant only after defining the unit factors. In these
+situations, users can define the relationships using the functions
+<code>allot_units</code> and <code>assign_units</code> to add the edges
+between the relevant unit nodes in the factor and level graphs,
+respectively.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>demo2 <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="fu">allot_units</span>(site <span class="sc">~</span> plot) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">assign_units</span>(<span class="at">order =</span> <span class="st">&quot;systematic-fastest&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="fu">serve_table</span>()</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; # Demo for defining units </span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; # An edibble: 72 x 2</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt;      site    plot</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt;    &lt;U(4)&gt; &lt;U(72)&gt;</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt;     &lt;chr&gt;   &lt;chr&gt;</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt;  1  site1  plot01</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt;  2  site2  plot02</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt;  3  site3  plot03</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt;  4  site4  plot04</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt;  5  site1  plot05</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt;  6  site2  plot06</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt;  7  site3  plot07</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt;  8  site4  plot08</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt;  9  site1  plot09</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 10  site2  plot10</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; # ℹ 62 more rows</span></span></code></pre></div>
+<p>The code above specifies the nested relationship of <code>plot</code>
+to <code>site</code>, with the assignment of levels performed
+systematically. The systematic allocation of <code>site</code> levels to
+<code>plot</code> is done so that the <code>site</code> levels vary the
+fastest, which is not the same systematic ordering as before. If the
+same result as before is desirable, users can define
+<code>order = &quot;systematic-slowest&quot;</code>, which offers a systematic
+assignment where the same levels are close together.</p>
+</div>
+<div id="sec-crossed" class="section level3">
+<h3>Crossed units</h3>
+<p>Crop field trials are often laid out in rectangular arrays. The
+experimenter confirms this by alerting to us that each site has plots
+laid out in a rectangular array with 6 rows and 3 columns. We can define
+crossing structures using <code>crossed_by</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">design</span>(<span class="st">&quot;Crossed experiment&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">row =</span> <span class="dv">6</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>            <span class="at">col =</span> <span class="dv">3</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>            <span class="at">plot =</span> <span class="fu">crossed_by</span>(row, col)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="fu">serve_table</span>()</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; # Crossed experiment </span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; # An edibble: 18 x 3</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt;       row    col    plot</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt;    &lt;U(6)&gt; &lt;U(3)&gt; &lt;U(18)&gt;</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt;     &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;  1   row1   col1  plot01</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt;  2   row2   col1  plot02</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt;  3   row3   col1  plot03</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt;  4   row4   col1  plot04</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt;  5   row5   col1  plot05</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt;  6   row6   col1  plot06</span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt;  7   row1   col2  plot07</span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt;  8   row2   col2  plot08</span></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt;  9   row3   col2  plot09</span></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; 10   row4   col2  plot10</span></span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; 11   row5   col2  plot11</span></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="co">#&gt; 12   row6   col2  plot12</span></span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; 13   row1   col3  plot13</span></span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="co">#&gt; 14   row2   col3  plot14</span></span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a><span class="co">#&gt; 15   row3   col3  plot15</span></span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a><span class="co">#&gt; 16   row4   col3  plot16</span></span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a><span class="co">#&gt; 17   row5   col3  plot17</span></span>
+<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a><span class="co">#&gt; 18   row6   col3  plot18</span></span></code></pre></div>
+<p>The above table does not contain information on the site. For this,
+we need to combine the nesting and crossing structures, as shown
+next.</p>
+</div>
+<div id="complex-unit-structures" class="section level3">
+<h3>Complex unit structures</h3>
+<p>Now, suppose that there are four sites (Narrabri, Horsham, Parkes,
+and Roseworthy), and the 18 plots at each site are laid out in a
+rectangular array of 3 rows and 6 columns. We begin by specifying the
+site (the highest hierarchy in this structure). The dimensions of the
+rows and columns are specified for each site (3 rows and 6 columns). The
+plot is a result of crossing the row and column within each site.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>complex <span class="ot">&lt;-</span> <span class="fu">design</span>(<span class="st">&quot;Complex structure&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">site =</span> <span class="fu">c</span>(<span class="st">&quot;Narrabri&quot;</span>, <span class="st">&quot;Horsham&quot;</span>, <span class="st">&quot;Parkes&quot;</span>, <span class="st">&quot;Roseworthy&quot;</span>),</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>            <span class="at">col =</span> <span class="fu">nested_in</span>(site, <span class="dv">6</span>),</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>            <span class="at">row =</span> <span class="fu">nested_in</span>(site, <span class="dv">3</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>            <span class="at">plot =</span> <span class="fu">nested_in</span>(site, <span class="fu">crossed_by</span>(row, col))) </span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">serve_table</span>(complex)</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; # Complex structure </span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; # An edibble: 72 x 4</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt;        site     col     row    plot</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt;      &lt;U(4)&gt; &lt;U(24)&gt; &lt;U(12)&gt; &lt;U(72)&gt;</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt;       &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt;  1 Narrabri   col01   row01  plot01</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#&gt;  2 Narrabri   col01   row02  plot02</span></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">#&gt;  3 Narrabri   col01   row03  plot03</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="co">#&gt;  4 Narrabri   col02   row01  plot04</span></span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a><span class="co">#&gt;  5 Narrabri   col02   row02  plot05</span></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a><span class="co">#&gt;  6 Narrabri   col02   row03  plot06</span></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a><span class="co">#&gt;  7 Narrabri   col03   row01  plot07</span></span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a><span class="co">#&gt;  8 Narrabri   col03   row02  plot08</span></span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a><span class="co">#&gt;  9 Narrabri   col03   row03  plot09</span></span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a><span class="co">#&gt; 10 Narrabri   col04   row01  plot10</span></span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a><span class="co">#&gt; 11 Narrabri   col04   row02  plot11</span></span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="co">#&gt; 12 Narrabri   col04   row03  plot12</span></span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="co">#&gt; 13 Narrabri   col05   row01  plot13</span></span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="co">#&gt; 14 Narrabri   col05   row02  plot14</span></span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a><span class="co">#&gt; 15 Narrabri   col05   row03  plot15</span></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="co">#&gt; 16 Narrabri   col06   row01  plot16</span></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="co">#&gt; 17 Narrabri   col06   row02  plot17</span></span>
+<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a><span class="co">#&gt; 18 Narrabri   col06   row03  plot18</span></span>
+<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a><span class="co">#&gt; 19  Horsham   col07   row04  plot19</span></span>
+<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a><span class="co">#&gt; 20  Horsham   col07   row05  plot20</span></span>
+<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a><span class="co">#&gt; # ℹ 52 more rows</span></span></code></pre></div>
+<p>You may realise that the labels for the rows do not start with “row1”
+for Horsham. The default output displays distinct labels for the unit
+levels that are actually distinct. This safeguards for instances where
+the relationship between factors is lost, and the analyst will have to
+guess what units may be nested or crossed. However, nested labels may
+still be desirable. You can select the factors to show the nested labels
+by naming these factors as arguments for the <code>label_nested</code>
+in <code>serve_table</code> (below shows the nesting labels for
+<code>row</code> and <code>col</code> – notice <code>plot</code> still
+shows the distinct labels).</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">serve_table</span>(complex, <span class="at">label_nested =</span> <span class="fu">c</span>(row, col))</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt; # Complex structure </span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; # An edibble: 72 x 4</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt;        site     col     row    plot</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt;      &lt;U(4)&gt; &lt;U(24)&gt; &lt;U(12)&gt; &lt;U(72)&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt;       &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co">#&gt;  1 Narrabri    col1    row1  plot01</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt;  2 Narrabri    col1    row2  plot02</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt;  3 Narrabri    col1    row3  plot03</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt;  4 Narrabri    col2    row1  plot04</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt;  5 Narrabri    col2    row2  plot05</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt;  6 Narrabri    col2    row3  plot06</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt;  7 Narrabri    col3    row1  plot07</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt;  8 Narrabri    col3    row2  plot08</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt;  9 Narrabri    col3    row3  plot09</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; 10 Narrabri    col4    row1  plot10</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="co">#&gt; 11 Narrabri    col4    row2  plot11</span></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co">#&gt; 12 Narrabri    col4    row3  plot12</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="co">#&gt; 13 Narrabri    col5    row1  plot13</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="co">#&gt; 14 Narrabri    col5    row2  plot14</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="co">#&gt; 15 Narrabri    col5    row3  plot15</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="co">#&gt; 16 Narrabri    col6    row1  plot16</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="co">#&gt; 17 Narrabri    col6    row2  plot17</span></span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="co">#&gt; 18 Narrabri    col6    row3  plot18</span></span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="co">#&gt; 19  Horsham    col1    row1  plot19</span></span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="co">#&gt; 20  Horsham    col1    row2  plot20</span></span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a><span class="co">#&gt; # ℹ 52 more rows</span></span></code></pre></div>
+<p>You later find that the dimensions of Narrabri and Roseworthy are
+larger. The experimenter tells you that there are in fact 9 columns
+available, and therefore 27 plots at Narrabri and Roseworthy. The number
+of columns can be modified according to each site, as below, where
+<code>col</code> is defined to have 9 levels at Narrabri and Roseworthy
+but 6 levels elsewhere.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>complexd <span class="ot">&lt;-</span> <span class="fu">design</span>(<span class="st">&quot;Complex structure with different dimensions&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="fu">set_units</span>(<span class="at">site =</span> <span class="fu">c</span>(<span class="st">&quot;Narrabri&quot;</span>, <span class="st">&quot;Horsham&quot;</span>, <span class="st">&quot;Parkes&quot;</span>, <span class="st">&quot;Roseworthy&quot;</span>),</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>             <span class="at">col =</span> <span class="fu">nested_in</span>(site, </span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>                      <span class="fu">c</span>(<span class="st">&quot;Narrabri&quot;</span>, <span class="st">&quot;Roseworthy&quot;</span>) <span class="sc">~</span> <span class="dv">9</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>                                                . <span class="sc">~</span> <span class="dv">6</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>             <span class="at">row =</span> <span class="fu">nested_in</span>(site, <span class="dv">3</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>            <span class="at">plot =</span> <span class="fu">nested_in</span>(site, <span class="fu">crossed_by</span>(row, col))) </span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>complextab <span class="ot">&lt;-</span> <span class="fu">serve_table</span>(complexd, <span class="at">label_nested =</span> <span class="fu">everything</span>())</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="fu">table</span>(complextab<span class="sc">$</span>site)</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt;    Horsham   Narrabri     Parkes Roseworthy </span></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co">#&gt;         18         27         18         27</span></span></code></pre></div>
+<p>You can see above that there are indeed nine additional plots at
+Narrabri and Roseworthy. The argument for <code>label_nested</code>
+supports <code>tidyselect</code> approach for selecting factors.</p>
+</div>
+</div>
+<div id="sec-trt" class="section level2">
+<h2>Treatments</h2>
+<p>Defining treatment factors is only necessary when designing a
+comparative experiment. The treatment factors can be set similar to the
+unit factors using <code>set_trts</code>. Below, we define an experiment
+with three treatment factors: variety (a or b), fertilizer (A or B), and
+amount of fertilizer (0.5, 1, or 2 t/ha).</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>factrt <span class="ot">&lt;-</span> <span class="fu">design</span>(<span class="st">&quot;Factorial treatment&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>  <span class="fu">set_trts</span>(<span class="at">variety =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>           <span class="at">fertilizer =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>           <span class="at">amount =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>)) </span></code></pre></div>
+<p>The links between treatment factors need not be explicitly defined.
+It is automatically assumed that treatment factors are crossed (i.e.,
+the resulting treatment is the combination of all treatment factors)
+with the full set of treatments shown via <code>trts_table</code>. For
+the above experiment, there are a total of 12 treatments with the levels
+given below.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">trts_table</span>(factrt)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt; # A tibble: 12 × 3</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co">#&gt;    variety fertilizer amount</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co">#&gt;  1 a       A             0.5</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co">#&gt;  2 b       A             0.5</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co">#&gt;  3 a       B             0.5</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="co">#&gt;  4 b       B             0.5</span></span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a><span class="co">#&gt;  5 a       A             1  </span></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a><span class="co">#&gt;  6 b       A             1  </span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a><span class="co">#&gt;  7 a       B             1  </span></span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a><span class="co">#&gt;  8 b       B             1  </span></span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a><span class="co">#&gt;  9 a       A             2  </span></span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a><span class="co">#&gt; 10 b       A             2  </span></span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a><span class="co">#&gt; 11 a       B             2  </span></span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="co">#&gt; 12 b       B             2</span></span></code></pre></div>
+<p>The <code>factrt</code> cannot be served as an
+<code>edbl_table</code> object, since there are no units defined in this
+experiment and how these treatments are administered to the units.</p>
+<div id="sec-conditioned" class="section level3">
+<h3>Conditional treatments</h3>
+<p>In some experiments, certain treatment factors are dependent on
+another treatment factor. A common example is when the dose or amount of
+a treatment factor is also a treatment factor. In the field trial
+example, we can have a case in which we administer no fertilizer to a
+plot. In this case, there is no point crossing with different
+<code>amount</code>s; in fact, the amount of no fertilizer should always
+be 0. We can specify this conditional treatment structure by describing
+this relationship using the helper function,
+<code>conditioned_on</code>, as below. The “.” in the LHS is a shorthand
+to mean all levels, except for those specified previously.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>factrtc <span class="ot">&lt;-</span> <span class="fu">design</span>(<span class="st">&quot;Factorial treatment with control&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  <span class="fu">set_trts</span>(<span class="at">variety =</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>           <span class="at">fertilizer =</span> <span class="fu">c</span>(<span class="st">&quot;none&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>),</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>           <span class="at">amount =</span> <span class="fu">conditioned_on</span>(fertilizer,</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>                                    <span class="st">&quot;none&quot;</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>                                         . <span class="sc">~</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>)))</span></code></pre></div>
+<p>We can see below that the variety is crossed with other factors, as
+expected, but the amount is conditional on the fertilizer.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">trts_table</span>(factrtc)</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="co">#&gt; # A tibble: 14 × 3</span></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="co">#&gt;    variety fertilizer amount</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt;</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt;  1 a       none          0  </span></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt;  2 b       none          0  </span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt;  3 a       A             0.5</span></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a><span class="co">#&gt;  4 b       A             0.5</span></span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a><span class="co">#&gt;  5 a       A             1  </span></span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a><span class="co">#&gt;  6 b       A             1  </span></span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a><span class="co">#&gt;  7 a       A             2  </span></span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a><span class="co">#&gt;  8 b       A             2  </span></span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a><span class="co">#&gt;  9 a       B             0.5</span></span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a><span class="co">#&gt; 10 b       B             0.5</span></span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a><span class="co">#&gt; 11 a       B             1  </span></span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a><span class="co">#&gt; 12 b       B             1  </span></span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a><span class="co">#&gt; 13 a       B             2  </span></span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a><span class="co">#&gt; 14 b       B             2</span></span></code></pre></div>
+</div>
+</div>
+<div id="links" class="section level2">
+<h2>Links</h2>
+<p>In <code>edibble</code>, each experimental factor is encoded as a
+node in the factor graph along with its levels as nodes in the level
+graph. The edges (or links) can only be specified after the nodes are
+created. The links define the relationship between the experimental
+factors and the direction determining the hierarchy with the nodes.
+Often, these links are implicitly understood and not explicitly encoded,
+thus making it difficult to utilise the information downstream. By
+encoding the links, we can derive information and validate processes
+downstream.</p>
+<p>Users specify these links using functions that are semantically
+aligned with thinking in the construction of an experimental design.
+There are three high-level approaches to defining these links as
+summarised in the table below:</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="40%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Approach</th>
+<th>Functions</th>
+<th>Modifies</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Within role group</td>
+<td><code>nested_in</code>, <code>crossed_by</code>,
+<code>conditioned_on</code></td>
+<td>Both factor and level graphs</td>
+<td>Links between the nodes of the same role only.</td>
+</tr>
+<tr class="even">
+<td>Allotment</td>
+<td><code>allot_trts</code>, <code>allot_units</code>,
+<code>set_rcrds</code>, <code>set_rcrds_of</code></td>
+<td>Factor graph only</td>
+<td>Capture high-level links that are typically apriori known by the
+user.</td>
+</tr>
+<tr class="odd">
+<td>Assignment</td>
+<td><code>assign_trts</code>, <code>assign_units</code></td>
+<td>Level graph only</td>
+<td>Determine links between nodes, often algorithmically.</td>
+</tr>
+</tbody>
+</table>
+<div id="sec-within" class="section level3">
+<h3>Within role group</h3>
+<p>The helper functions, <code>nested_in</code> and
+<code>crossed_by</code> construct nested and crossed units, respectively
+(shown above). The helper function, <code>conditioned_on</code>
+(demonstrated above) constructs a conditional treatment structure. These
+helper functions concurrently draw links between the relevant nodes in
+both factor and level graphs. These links would be apriori known to the
+user and these helper functions are just semantically designed to make
+it easier for the user to specify the links between nodes. These helper
+functions only construct links between nodes belonging to the same role
+(i.e., unit or treatment).</p>
+</div>
+<div id="sec-allot" class="section level3">
+<h3>Allotment</h3>
+<p>Links specified using an allotment approach designate high-level
+links between factors. In other words, this approach only draws edges
+between nodes in the factor graph, and almost always, these edges are
+intentionally formed by the user. The purpose of this approach is to
+capture a user’s high-level intention or knowledge.</p>
+<p>For demonstration, we leverage the previously defined unit
+(<code>complexd</code>) and treatment structures (<code>factrtc</code>).
+These structures can be combined to obtain the combined design object as
+below.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>complexd <span class="sc">+</span> factrtc</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="co">#&gt; Complex structure with different dimensions</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="co">#&gt; ├─site (4 levels)</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="co">#&gt; │ ├─col (30 levels)</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="co">#&gt; │ │ └─plot (90 levels)</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="co">#&gt; │ ├─row (12 levels)</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="co">#&gt; │ │ └─plot (90 levels)</span></span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="co">#&gt; │ └─plot (90 levels)</span></span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">#&gt; ├─variety (2 levels)</span></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#&gt; ├─fertilizer (3 levels)</span></span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="co">#&gt; └─amount (4 levels)</span></span></code></pre></div>
+<p>The above design object does not describe the links between the
+treatments and units. The function <code>allot_trts</code> ascribes the
+links between treatments to units in the factor graph.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>alloted1 <span class="ot">&lt;-</span> (complexd <span class="sc">+</span> factrtc) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>  <span class="fu">allot_trts</span>(    fertilizer <span class="sc">~</span> row,</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>             amount<span class="sc">:</span>variety <span class="sc">~</span> plot)</span></code></pre></div>
+</div>
+<div id="sec-assign" class="section level3">
+<h3>Assignment</h3>
+<p>The <code>assign_trts</code> (often algorithmically) draw links
+between the treatment and unit nodes in the level graph (conditioned on
+the existing links in the factor graph).</p>
+<p>There are five in-built assignment algorithms: “systematic-fastest”
+(synonym for “systematic”), “systematic-random-fastest” (synonym for
+“systematic-random”), “systematic-slowest”, “systematic-random-slowest”,
+and “random”. The variation in systematic assignment results in repeated
+ordering with respect to the unit order, without regard to any unit
+structure. When the number of units is not divisible by the total number
+of treatments, the earlier treatment levels would have an extra
+replicate. The “systematic-random-fastest” and
+“systematic-random-slowest” are systematic variants that ensure equal
+chances for all treatment levels to obtain an extra replicate by
+randomising the order of treatment levels before the systematic
+allocation of treatment to units proceeds. The “fastest” and “slowest”
+variants determine if treatment levels are fast or slow in varying
+across order of the unit (slow varying meaning that the same treatment
+levels will be closer together in unit order, whereas fast varying means
+the same treatment levels are spread out in unit order).</p>
+<p>Building on the previously defined structure and allotment, we define
+an algorithm to assign links between unit and treatment levels using the
+function <code>assign_trts</code>. Below, we use a systematic ordering
+for the first allotment (fertilizer to row) then a random ordering for
+the second allotment (interaction of amount and variety to plot). An
+optional seed number is provided to ensure the generated design could be
+reproduced.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>design1 <span class="ot">&lt;-</span> alloted1 <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  <span class="fu">assign_trts</span>(<span class="at">order =</span> <span class="fu">c</span>(<span class="st">&quot;systematic&quot;</span>, <span class="st">&quot;random&quot;</span>),</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">2023</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>  <span class="fu">serve_table</span>(<span class="at">label_nested =</span> <span class="fu">c</span>(row, col))</span></code></pre></div>
+<p>While allotment (high-level allocation) and assignment (actual
+allocation) are distinguished in the system to provide flexibility to
+the user for defining these processes separately, it is likely that many
+users would concurrently define these processes. The
+<code>allot_table</code> function offers a shorthand that combines the
+call to <code>allot_trts</code>, <code>assign_trts</code>, and
+<code>serve_table</code> into one call.</p>
+<p>To illustrate the difference when treatment interaction is alloted to
+a unit (like the second allotment in <code>allotment1</code>), below, we
+have a different allotment where the amount of fertilizer and variety
+are allotted to plot in a separate allotment. A separate allotment can
+be assigned using different algorithms and is considered independent of
+other allotments (unless the treatment factor is conditional on another
+treatment factor).</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>design2 <span class="ot">&lt;-</span> (complexd <span class="sc">+</span> factrtc) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>  <span class="fu">allot_table</span>(fertilizer <span class="sc">~</span> row,</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>                  amount <span class="sc">~</span> plot,</span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>                 variety <span class="sc">~</span> plot, </span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>              <span class="at">order =</span> <span class="fu">c</span>(<span class="st">&quot;systematic&quot;</span>, <span class="st">&quot;random&quot;</span>, <span class="st">&quot;random&quot;</span>),</span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>              <span class="at">label_nested =</span> <span class="fu">c</span>(row, col),</span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">2023</span>)</span></code></pre></div>
+<p>The assignment algorithms in the system use the default constraint,
+which takes the nesting structure defined in the unit structure
+(i.e. row is nested in site and plot is crossed by row and column and
+nested in site). This constraint is used to define the nature of
+“random” assignment. For example, in the code below, we relax this
+constraint such that the <code>plot</code> factor is constrained within
+a <code>row</code> (default was <code>row</code>, <code>col</code> and
+<code>site</code>), which in turn is contained within the
+<code>site</code>. This difference in constraints results in a different
+path in the algorithm (as shown in the overview in <span class="citation">@fig-assign-alg</span>).</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>design3 <span class="ot">&lt;-</span> alloted1 <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>  <span class="fu">assign_trts</span>(<span class="at">order =</span> <span class="fu">c</span>(<span class="st">&quot;systematic&quot;</span>, <span class="st">&quot;random&quot;</span>),</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>              <span class="at">seed =</span> <span class="dv">2023</span>, </span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>              <span class="at">constrain =</span> <span class="fu">list</span>(<span class="at">row =</span> <span class="st">&quot;site&quot;</span>, <span class="at">plot =</span> <span class="st">&quot;row&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>  <span class="fu">serve_table</span>(<span class="at">label_nested =</span> <span class="fu">c</span>(row, col))</span></code></pre></div>
+<p>The above three different designs (<code>design1</code>,
+<code>design2</code> and <code>design3</code>) share the same unit and
+treatment structure, but the allotment and/or assignment algorithm
+differed. One result of this is that the treatment replications, differ
+across the generated designs with the most ideal distribution seen in
+<code>design3</code> (if all fertilizer and amount combinations are of
+equal interest and fertilizer allocation is restricted to the row;
+arguably, it is better to remove the latter constraint, if practically
+feasible, so the units with the control treatment can be assigned for
+other treatment levels to obtain a more even distribution). The
+difference in <code>design1</code> and <code>design2</code> is that the
+amount and variety were allocated as an interaction in the former but
+independently in the latter. The latter process does not ensure
+near-equal replication of the treatment levels, so it is not surprising
+that <code>design2</code> has the least uniform treatment
+distribution.</p>
+<p>Finding or creating the most appropriate assignment algorithm is one
+of the challenging tasks in the whole workflow. The default algorithm is
+unlikely to be optimal for the given structure, and the user is
+encouraged to modify this step to suit their own design.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

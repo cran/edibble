@@ -46,8 +46,9 @@ plot.edbl_design <- function(x, which = c("factors", "levels"),
                         "factors" = gsub("edbl_", "", nodes$role),
                         "levels" = nodes$fct_var)
   nodes$label <- nodes$name
-  class2shape <- c("edbl_unit" = "circle",
-                   "edbl_trt" = ifelse(which=="factors", "diamond", "circle"),
+  # FIXME: for some reason, dot doesn't show when doing levels plot
+  class2shape <- c("edbl_unit" = ifelse(which=="factors", "dot", "ellipse"),
+                   "edbl_trt" = ifelse(which=="factors", "diamond", "ellipse"),
                    "edbl_rcrd" = "database")
   nodes$shape <- class2shape[nodes$role]
 
@@ -92,8 +93,8 @@ plot.edbl_design <- function(x, which = c("factors", "levels"),
                                background = background,
                                ) %>%
     visNetwork::visLayout(randomSeed = seed) %>%
-    visNetwork::visNodes(id = "id") %>%
-    visNetwork::visEdges(id = "id")
+    visNetwork::visNodes(id = "id")
+    #visNetwork::visEdges(id = "id")
     #visNetwork::visHierarchicalLayout()
     #visNetwork::visLegend() %>%
   switch(view,
